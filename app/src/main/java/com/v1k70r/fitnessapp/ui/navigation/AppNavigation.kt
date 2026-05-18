@@ -1,14 +1,12 @@
 package com.v1k70r.fitnessapp.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.v1k70r.fitnessapp.ui.screens.dashboard.DashboardScreen
-import com.v1k70r.fitnessapp.ui.screens.training.TrainingScreen
 import com.v1k70r.fitnessapp.ui.screens.nutrition.NutritionScreen
 import com.v1k70r.fitnessapp.ui.screens.pedometer.PedometerScreen
 
@@ -27,7 +25,8 @@ fun AppNavigation(
         }
 
         composable(Screen.Training.route) {
-            TrainingScreen()
+            val trainingNavController = rememberNavController()
+            TrainingNavigation(navController = trainingNavController)
         }
 
         composable(Screen.Nutrition.route) {

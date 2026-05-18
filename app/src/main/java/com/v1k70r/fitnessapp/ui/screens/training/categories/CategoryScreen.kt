@@ -1,5 +1,6 @@
-package com.v1k70r.fitnessapp.ui.screens.training
+package com.v1k70r.fitnessapp.ui.screens.training.categories
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,64 +15,54 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
-data class Exercise(
-    val name: String,
-    val sets: String
-)
+import androidx.navigation.NavHostController
+import com.v1k70r.fitnessapp.ui.navigation.TrainingRoutes
 
 @Composable
-fun TrainingScreen() {
-
-    val exercises = listOf(
-        Exercise("Bench Press", "4 x 8"),
-        Exercise("Squat", "5 x 5"),
-        Exercise("Deadlift", "3 x 5"),
-        Exercise("Pull Ups", "4 x 10")
+fun CategoryScreen(
+    navController: NavHostController
+) {
+    val categories = listOf(
+        "Chest",
+        "Back",
+        "Legs",
+        "Shoulders",
+        "Arms",
+        "Core"
     )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
-
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-
         Text(
-            text = "Entrenamiento",
+            text = "Categorías",
             style = MaterialTheme.typography.headlineMedium
         )
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            items(exercises) { exercise ->
-
+            items(categories) { category ->
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navController.navigate(
+                                TrainingRoutes.ExerciseList.createRoute(category)
+                            )
+                        },
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
                 ) {
-
-                    Column(
+                    Text(
+                        text = category,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(20.dp)
-                    ) {
-
-                        Text(
-                            text = exercise.name,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-
-                        Text(
-                            text = exercise.sets,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    )
                 }
             }
         }
