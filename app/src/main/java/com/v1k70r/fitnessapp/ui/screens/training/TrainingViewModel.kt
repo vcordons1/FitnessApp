@@ -1,26 +1,106 @@
 package com.v1k70r.fitnessapp.ui.screens.training
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.v1k70r.fitnessapp.data.repository.TrainingRepository
 import com.v1k70r.fitnessapp.domain.model.ExerciseSet
-import com.v1k70r.fitnessapp.domain.model.LoggedExercise
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class TrainingViewModel : ViewModel() {
+class TrainingViewModel(
+    private val repository: TrainingRepository
+) : ViewModel() {
 
-    private val _loggedExercises = mutableStateListOf<LoggedExercise>()
-    val loggedExercises: List<LoggedExercise> = _loggedExercises
+    private var sesionActivaId: Long? = null
 
-    fun addLoggedExercise(
-        exerciseName: String,
-        sets: List<ExerciseSet>
+    val sesionesEntrenamiento = repository
+        .obtenerSesionesEntrenamiento()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun registrarEjercicio(
+        nombreEjercicio: String,
+        categoria: String,
+        series: List<ExerciseSet>
     ) {
-        if (exerciseName.isNotBlank() && sets.isNotEmpty()) {
-            _loggedExercises.add(
-                LoggedExercise(
-                    exerciseName = exerciseName,
-                    sets = sets
-                )
+        if (nombreEjercicio.isBlank() || categoria.isBlank() || series.isEmpty()) return
+
+        val haySerieInvalida = series.any { serie ->
+            serie.weight.toDoubleOrNull() == null || serie.reps.toIntOrNull() == null
+        }
+
+        if (haySerieInvalida) return
+
+        viewModelScope.launch {
+            val idSesion = sesionActivaId ?: repository.crearSesionEntrenamiento().also { nuevaSesionId ->
+                sesionActivaId = nuevaSesionId
+            }
+
+            repository.registrarEjercicioEnSesion(
+                sesionId = idSesion,
+                nombreEjercicio = nombreEjercicio,
+                categoria = categoria,
+                series = series
             )
+        }
+    }
+
+    fun finalizarSesionActiva() {
+        val idSesion = sesionActivaId ?: return
+
+        viewModelScope.launch {
+            repository.finalizarSesionEntrenamiento(idSesion)
+            sesionActivaId = null
+        }
+    }
+
+    fun borrarSesionEntrenamiento(sesionId: Long) {
+        viewModelScope.launch {
+            repository.borrarSesionEntrenamiento(sesionId)
+
+            if (sesionActivaId == sesionId) {
+                sesionActivaId = null
+            }
+        }
+    }
+
+    fun actualizarSerieGuardada(
+        serieId: Long,
+        ejercicioRegistradoId: Long,
+        numeroSerie: Int,
+        peso: String,
+        repeticiones: String
+    ) {
+        val pesoValido = peso.toDoubleOrNull()
+        val repeticionesValidas = repeticiones.toIntOrNull()
+
+        if (pesoValido == null || pesoValido <= 0) return
+        if (repeticionesValidas == null || repeticionesValidas <= 0) return
+
+        viewModelScope.launch {
+            repository.actualizarSerieGuardada(
+                serieId = serieId,
+                ejercicioRegistradoId = ejercicioRegistradoId,
+                numeroSerie = numeroSerie,
+                peso = pesoValido,
+                repeticiones = repeticionesValidas
+            )
+        }
+    }
+
+    fun borrarSerieGuardada(serieId: Long) {
+        viewModelScope.launch {
+            repository.borrarSerieGuardada(serieId)
+        }
+    }
+
+    fun borrarEjercicioRegistrado(ejercicioRegistradoId: Long) {
+        viewModelScope.launch {
+            repository.borrarEjercicioRegistrado(ejercicioRegistradoId)
         }
     }
 }

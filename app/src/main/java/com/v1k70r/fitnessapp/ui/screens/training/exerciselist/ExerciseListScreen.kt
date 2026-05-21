@@ -24,46 +24,46 @@ fun ExerciseListScreen(
     category: String
 ) {
     val exercises = when (category) {
-        "Chest" -> listOf(
-            "Bench Press",
-            "Incline Barbell Bench Press",
-            "Flat Dumbbell Bench Press",
-            "Cable Fly"
+        "Pecho" -> listOf(
+            "Press banca",
+            "Press inclinado con barra",
+            "Press plano con mancuernas",
+            "Aperturas en polea"
         )
 
-        "Back" -> listOf(
-            "Pull Ups",
-            "Barbell Row",
-            "Lat Pulldown",
-            "Seated Cable Row"
+        "Espalda" -> listOf(
+            "Dominadas",
+            "Remo con barra",
+            "Jalón al pecho",
+            "Remo sentado en polea"
         )
 
-        "Legs" -> listOf(
-            "Squat",
-            "Leg Press",
-            "Romanian Deadlift",
-            "Leg Curl"
+        "Piernas" -> listOf(
+            "Sentadilla",
+            "Prensa de piernas",
+            "Peso muerto rumano",
+            "Curl femoral"
         )
 
-        "Shoulders" -> listOf(
-            "Overhead Press",
-            "Lateral Raise",
-            "Rear Delt Fly",
-            "Arnold Press"
+        "Hombros" -> listOf(
+            "Press militar",
+            "Elevaciones laterales",
+            "Aperturas posteriores",
+            "Press Arnold"
         )
 
-        "Arms" -> listOf(
-            "Biceps Curl",
-            "Triceps Pushdown",
-            "Hammer Curl",
-            "Skull Crushers"
+        "Brazos" -> listOf(
+            "Curl de bíceps",
+            "Extensión de tríceps en polea",
+            "Curl martillo",
+            "Rompecráneos"
         )
 
-        "Core" -> listOf(
-            "Crunches",
-            "Plank",
-            "Hanging Leg Raise",
-            "Cable Crunch"
+        "Abdomen" -> listOf(
+            "Crunch abdominal",
+            "Plancha",
+            "Elevación de piernas colgado",
+            "Crunch en polea"
         )
 
         else -> emptyList()
@@ -89,7 +89,10 @@ fun ExerciseListScreen(
                         .fillMaxWidth()
                         .clickable {
                             navController.navigate(
-                                TrainingRoutes.TrackExercise.createRoute(exercise)
+                                TrainingRoutes.TrackExercise.createRoute(
+                                    category = category,
+                                    exerciseName = exercise
+                                )
                             )
                         },
                     colors = CardDefaults.cardColors(

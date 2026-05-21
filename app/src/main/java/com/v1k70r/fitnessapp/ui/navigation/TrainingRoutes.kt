@@ -13,9 +13,14 @@ sealed class TrainingRoutes(
         }
     }
 
-    data object TrackExercise : TrainingRoutes("track_exercise/{exerciseName}") {
-        fun createRoute(exerciseName: String): String {
-            return "track_exercise/$exerciseName"
+    data object TrackExercise : TrainingRoutes(
+        route = "track_exercise/{category}/{exerciseName}"
+    ) {
+        fun createRoute(
+            category: String,
+            exerciseName: String
+        ): String {
+            return "track_exercise/$category/$exerciseName"
         }
     }
 }

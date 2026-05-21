@@ -1,6 +1,10 @@
 package com.v1k70r.fitnessapp.ui.navigation
 
+import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,14 +13,16 @@ import com.v1k70r.fitnessapp.ui.screens.training.exerciselist.ExerciseListScreen
 import com.v1k70r.fitnessapp.ui.screens.training.track.TrackExerciseScreen
 import com.v1k70r.fitnessapp.ui.screens.training.workoutlog.WorkoutLogScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.v1k70r.fitnessapp.data.local.FitnessDatabase
+import com.v1k70r.fitnessapp.data.repository.TrainingRepository
 import com.v1k70r.fitnessapp.ui.screens.training.TrainingViewModel
 
 @Composable
 fun TrainingNavigation(
-    navController: NavHostController
+    navController: NavHostController,
+    trainingViewModel: TrainingViewModel
 ) {
 
-    val trainingViewModel: TrainingViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -44,15 +50,24 @@ fun TrainingNavigation(
             )
         }
 
-        composable(TrainingRoutes.TrackExercise.route) { backStackEntry ->
+        composable(
+            route = TrainingRoutes.TrackExercise.route
+        ) { backStackEntry ->
 
-            val exerciseName = backStackEntry.arguments?.getString("exerciseName") ?: ""
+            val category =
+                backStackEntry.arguments?.getString("category") ?: ""
+
+            val exerciseName =
+                backStackEntry.arguments?.getString("exerciseName") ?: ""
 
             TrackExerciseScreen(
                 navController = navController,
+                category = category,
                 exerciseName = exerciseName,
                 trainingViewModel = trainingViewModel
             )
         }
     }
 }
+
+

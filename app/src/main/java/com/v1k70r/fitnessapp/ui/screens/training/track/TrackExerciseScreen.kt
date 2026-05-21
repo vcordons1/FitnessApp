@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,11 +33,15 @@ import com.v1k70r.fitnessapp.domain.model.ExerciseSet
 @Composable
 fun TrackExerciseScreen(
     navController: NavHostController,
+    category: String,
     exerciseName: String,
     trainingViewModel: TrainingViewModel
 ) {
     var weight by remember { mutableStateOf("") }
     var reps by remember { mutableStateOf("") }
+    var errorPeso by remember { mutableStateOf(false) }
+    var errorRepeticiones by remember { mutableStateOf(false) }
+    var indiceSerieEditando by remember { mutableStateOf<Int?>(null) }
 
     val sets = remember {
         mutableStateListOf<ExerciseSet>()
@@ -59,6 +64,12 @@ fun TrackExerciseScreen(
         ) {
             OutlinedTextField(
                 value = weight,
+                isError = errorPeso,
+                supportingText = {
+                    if (errorPeso) {
+                        Text("Ingresa un peso válido")
+                    }
+                },
                 onValueChange = { weight = it },
                 label = {
                     Text("Peso")
@@ -68,6 +79,12 @@ fun TrackExerciseScreen(
 
             OutlinedTextField(
                 value = reps,
+                isError = errorRepeticiones,
+                supportingText = {
+                    if (errorRepeticiones) {
+                        Text("Ingresa repeticiones válidas")
+                    }
+                },
                 onValueChange = { reps = it },
                 label = {
                     Text("Reps")
@@ -78,29 +95,50 @@ fun TrackExerciseScreen(
 
         Button(
             onClick = {
-                if (weight.isNotBlank() && reps.isNotBlank()) {
+                val pesoValido = weight.toDoubleOrNull() != null && weight.toDouble() > 0
+                val repeticionesValidas = reps.toIntOrNull() != null && reps.toInt() > 0
 
-                    sets.add(
-                        ExerciseSet(
-                            weight = weight,
-                            reps = reps
-                        )
+                errorPeso = !pesoValido
+                errorRepeticiones = !repeticionesValidas
+
+                if (pesoValido && repeticionesValidas) {
+                    val nuevaSerie = ExerciseSet(
+                        weight = weight,
+                        reps = reps
                     )
+
+                    val indiceActual = indiceSerieEditando
+
+                    if (indiceActual == null) {
+                        sets.add(nuevaSerie)
+                    } else {
+                        sets.add(indiceActual, nuevaSerie)
+                        indiceSerieEditando = null
+                    }
 
                     weight = ""
                     reps = ""
+                    errorPeso = false
+                    errorRepeticiones = false
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Agregar set")
+            Text(
+                if (indiceSerieEditando == null) {
+                    "Agregar serie"
+                } else {
+                    "Guardar cambios"
+                }
+            )
         }
 
         Button(
             onClick = {
-                trainingViewModel.addLoggedExercise(
-                    exerciseName = exerciseName,
-                    sets = sets.toList()
+                trainingViewModel.registrarEjercicio(
+                    nombreEjercicio = exerciseName,
+                    categoria = category,
+                    series = sets.toList()
                 )
 
                 navController.popBackStack(
@@ -122,18 +160,40 @@ fun TrackExerciseScreen(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(sets) { set ->
+            itemsIndexed(sets) { index, set ->
+
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "${set.weight} kg x ${set.reps} reps",
-                        modifier = Modifier.padding(20.dp),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Serie ${index + 1}: ${set.weight} kg x ${set.reps} reps"
+                        )
+
+                        Button(
+                            onClick = {
+                                weight = set.weight
+                                reps = set.reps
+                                indiceSerieEditando = index
+                                sets.removeAt(index)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Editar serie")
+                        }
+
+                        Button(
+                            onClick = {
+                                sets.removeAt(index)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Borrar serie")
+                        }
+                    }
                 }
             }
         }

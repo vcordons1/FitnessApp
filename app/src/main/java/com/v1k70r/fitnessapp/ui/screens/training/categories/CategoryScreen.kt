@@ -23,12 +23,12 @@ fun CategoryScreen(
     navController: NavHostController
 ) {
     val categories = listOf(
-        "Chest",
-        "Back",
-        "Legs",
-        "Shoulders",
-        "Arms",
-        "Core"
+        "Pecho",
+        "Espalda",
+        "Piernas",
+        "Hombros",
+        "Brazos",
+        "Abdomen"
     )
 
     Column(

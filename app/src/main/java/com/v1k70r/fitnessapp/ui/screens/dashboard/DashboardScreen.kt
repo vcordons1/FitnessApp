@@ -12,9 +12,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.v1k70r.fitnessapp.ui.components.StatCard
+import com.v1k70r.fitnessapp.ui.screens.training.TrainingViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    trainingViewModel: TrainingViewModel
+) {
+
+    val sesionesEntrenamiento by trainingViewModel.sesionesEntrenamiento.collectAsState()
+
+    val sesionActivaHoy = sesionesEntrenamiento.firstOrNull { session ->
+        session.endedAt == null && esHoy(session.startedAt)
+    }
+
+    val ejerciciosRegistrados = sesionActivaHoy?.exercises?.size ?: 0
+
+    val seriesTotales = sesionActivaHoy
+        ?.exercises
+        ?.sumOf { exercise -> exercise.sets.size }
+        ?: 0
+
+    val ultimoEjercicio = sesionActivaHoy
+        ?.exercises
+        ?.lastOrNull()
+        ?.exerciseName
+        ?: "Sin ejercicios registrados"
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -22,48 +47,39 @@ fun DashboardScreen() {
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(
-            text = "FitnessApp",
+            text = "Entrenamiento de hoy",
             style = MaterialTheme.typography.headlineMedium
         )
 
         Text(
-            text = "Resumen diario",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = if (sesionActivaHoy == null) {
+                "No hay entrenamiento activo"
+            } else {
+                "Entrenamiento en progreso"
+            }
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            StatCard(
-                title = "Calorías",
-                value = "1,840 kcal",
-                modifier = Modifier.weight(1f)
-            )
+        Text(
+            text = "Ejercicios registrados: $ejerciciosRegistrados"
+        )
 
-            StatCard(
-                title = "Pasos",
-                value = "7,230",
-                modifier = Modifier.weight(1f)
-            )
-        }
+        Text(
+            text = "Series totales: $seriesTotales"
+        )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            StatCard(
-                title = "Entrenos",
-                value = "1 sesión",
-                modifier = Modifier.weight(1f)
-            )
-
-            StatCard(
-                title = "Proteína",
-                value = "120 g",
-                modifier = Modifier.weight(1f)
-            )
-        }
+        Text(
+            text = "Último ejercicio: $ultimoEjercicio"
+        )
     }
+}
+
+private fun esHoy(timestamp: Long): Boolean {
+    val calendarioSesion = java.util.Calendar.getInstance().apply {
+        timeInMillis = timestamp
+    }
+
+    val calendarioHoy = java.util.Calendar.getInstance()
+
+    return calendarioSesion.get(java.util.Calendar.YEAR) == calendarioHoy.get(java.util.Calendar.YEAR) &&
+            calendarioSesion.get(java.util.Calendar.DAY_OF_YEAR) == calendarioHoy.get(java.util.Calendar.DAY_OF_YEAR)
 }
