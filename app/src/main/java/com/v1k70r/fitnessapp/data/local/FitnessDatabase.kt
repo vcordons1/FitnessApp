@@ -8,19 +8,25 @@ import com.v1k70r.fitnessapp.data.entity.ExerciseSetEntity
 import com.v1k70r.fitnessapp.data.entity.LoggedExerciseEntity
 import com.v1k70r.fitnessapp.data.entity.WorkoutSessionEntity
 import com.v1k70r.fitnessapp.data.local.dao.LoggedExerciseDao
+import com.v1k70r.fitnessapp.data.local.steps.StepDao
+import com.v1k70r.fitnessapp.data.local.steps.StepEntity
 
 
 @Database(
     entities = [
         WorkoutSessionEntity::class,
         LoggedExerciseEntity::class,
-        ExerciseSetEntity::class
+        ExerciseSetEntity::class,
+        StepEntity::class
     ],
-    version = 2
+    version = 4,
+    exportSchema = false
 )
 abstract class FitnessDatabase : RoomDatabase() {
 
     abstract fun loggedExerciseDao(): LoggedExerciseDao
+
+    abstract fun stepDao(): StepDao
 
     companion object {
         @Volatile

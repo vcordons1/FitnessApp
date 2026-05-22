@@ -1,67 +1,150 @@
 package com.v1k70r.fitnessapp.ui.screens.pedometer
 
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.v1k70r.fitnessapp.ui.screens.pedometer.components.BotonPausaPasos
+import com.v1k70r.fitnessapp.ui.screens.pedometer.components.ResumenDiarioPasos
+import com.v1k70r.fitnessapp.ui.screens.pedometer.components.ResumenMensualPasos
+import com.v1k70r.fitnessapp.ui.screens.pedometer.components.ResumenSemanalPasos
+import com.v1k70r.fitnessapp.ui.screens.pedometer.components.SelectorPeriodoPasos
+import com.v1k70r.fitnessapp.ui.screens.pedometer.service.StepCounterService
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
 @Composable
-fun PedometerScreen() {
-    val steps = 7230
-    val goal = 10000
-    val progress = steps.toFloat() / goal.toFloat()
+fun PedometerScreen(
+    viewModel: PedometerViewModel = viewModel()
+) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Podómetro",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.align(Alignment.Start)
-        )
+    val context = LocalContext.current
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            CircularProgressIndicator(
-                progress = { progress },
-                modifier = Modifier.size(220.dp),
-                strokeWidth = 16.dp,
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+    val uiState by viewModel.uiState.collectAsState()
 
-            Text(
-                text = "$steps pasos",
-                style = MaterialTheme.typography.headlineMedium
-            )
+    val activityRecognitionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val intent = Intent(context, StepCounterService::class.java)
 
-            Text(
-                text = "Meta diaria: $goal pasos",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACTIVITY_RECOGNITION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            val intent = Intent(context, StepCounterService::class.java)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+        } else {
+            activityRecognitionLauncher.launch(
+                Manifest.permission.ACTIVITY_RECOGNITION
             )
         }
+    }
 
-        Button(
-            onClick = { },
-            modifier = Modifier.padding(bottom = 20.dp)
+    Scaffold { padding ->
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+
+            contentPadding = PaddingValues(20.dp),
+
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            Text(text = "Pausar")
+
+            item {
+
+                Text(
+                    text = "Pasos",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
+
+            item {
+
+                SelectorPeriodoPasos(
+                    selectedPeriod = uiState.selectedPeriod,
+                    onPeriodSelected = viewModel::changePeriod
+                )
+            }
+
+            item {
+
+                when (uiState.selectedPeriod) {
+
+                    PedometerPeriod.DIA -> {
+
+                        ResumenDiarioPasos(
+                            steps = uiState.todaySteps,
+                            goal = uiState.dailyGoal,
+                            progress = uiState.progress,
+                            calories = uiState.calories,
+                            distanceKm = uiState.distanceKm
+                        )
+                    }
+
+                    PedometerPeriod.SEMANA -> {
+
+                        ResumenSemanalPasos(
+                            totalSteps = uiState.weeklySteps,
+                            averageSteps = uiState.weeklyAverage,
+                            history = uiState.weeklyHistory
+                        )
+                    }
+
+                    PedometerPeriod.MES -> {
+
+                        ResumenMensualPasos(
+                            totalSteps = uiState.monthlySteps,
+                            averageSteps = uiState.monthlyAverage,
+                            history = uiState.monthlyHistory
+                        )
+                    }
+                }
+            }
+
+            item {
+
+                BotonPausaPasos(
+                    isPaused = uiState.isPaused,
+                    onTogglePause = viewModel::togglePause
+                )
+            }
         }
     }
 }
