@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.v1k70r.fitnessapp.ui.screens.pedometer.components.BotonPausaPasos
 import com.v1k70r.fitnessapp.ui.screens.pedometer.components.ResumenDiarioPasos
 import com.v1k70r.fitnessapp.ui.screens.pedometer.components.ResumenMensualPasos
@@ -33,8 +32,8 @@ import androidx.core.content.ContextCompat
 
 @Composable
 fun PedometerScreen(
-    viewModel: PedometerViewModel = viewModel()
-) {
+    viewModel: PedometerViewModel
+){
 
     val context = LocalContext.current
 

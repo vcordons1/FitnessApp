@@ -84,7 +84,9 @@ fun AppNavigation(
         }
 
         composable(Screen.Pedometer.route) {
-            PedometerScreen()
+            PedometerScreen(
+                viewModel = pedometerViewModel
+            )
         }
     }
 }
