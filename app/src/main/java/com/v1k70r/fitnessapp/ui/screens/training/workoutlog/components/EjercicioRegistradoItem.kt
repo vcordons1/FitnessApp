@@ -3,10 +3,10 @@ package com.v1k70r.fitnessapp.ui.screens.training.workoutlog.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,21 +20,31 @@ fun EjercicioRegistradoItem(
     repeticionesEditadas: String,
     onPesoEditadoChange: (String) -> Unit,
     onRepeticionesEditadasChange: (String) -> Unit,
-    onEditarSerieClick: (serieId: Long, peso: String, repeticiones: String) -> Unit,
-    onGuardarSerieClick: (serieId: Long, numeroSerie: Int) -> Unit,
+    onEditarSerieClick: (
+        serieId: Long,
+        peso: String,
+        repeticiones: String
+    ) -> Unit,
+    onGuardarSerieClick: (
+        serieId: Long,
+        numeroSerie: Int
+    ) -> Unit,
     onCancelarEdicionClick: () -> Unit,
     onBorrarSerieClick: (serieId: Long) -> Unit,
     onBorrarEjercicioClick: () -> Unit
 ) {
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+
         HorizontalDivider()
 
         Text(
             text = ejercicio.exerciseName,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         ejercicio.sets.forEach { serie ->
@@ -73,11 +83,5 @@ fun EjercicioRegistradoItem(
             }
         }
 
-        Button(
-            onClick = onBorrarEjercicioClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Borrar ejercicio")
-        }
     }
 }

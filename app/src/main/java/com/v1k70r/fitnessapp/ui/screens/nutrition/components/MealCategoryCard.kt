@@ -43,7 +43,7 @@ fun MealCategoryCard(
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -99,19 +99,19 @@ fun MealCategoryCard(
                 entries.forEach { entry ->
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(18.dp),
+                        shape = RoundedCornerShape(22.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(14.dp),
+                                .padding(horizontal = 16.dp, vertical = 18.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(
                                 modifier = Modifier.weight(1f),
-                                verticalArrangement = Arrangement.spacedBy(3.dp)
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
                                 Text(
                                     text = entry.food.name,

@@ -45,7 +45,7 @@ fun NutritionScreen(
                 onClick = { showFoodSheet = true },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
+            )  {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Agregar alimento"
@@ -56,9 +56,14 @@ fun NutritionScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 20.dp, vertical = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+                .padding(innerPadding),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                start = 20.dp,
+                top = 24.dp,
+                end = 20.dp,
+                bottom = 110.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(22.dp)
         ) {
             item {
                 Column(

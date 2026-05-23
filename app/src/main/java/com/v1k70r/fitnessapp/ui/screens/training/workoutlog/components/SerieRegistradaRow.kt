@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import com.v1k70r.fitnessapp.domain.model.ExerciseSet
 
 @Composable
@@ -19,19 +20,22 @@ fun SerieRegistradaRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = "Serie ${serie.setNumber}",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = "${serie.weight} kg x ${serie.reps} reps",
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
@@ -39,13 +43,19 @@ fun SerieRegistradaRow(
             TextButton(
                 onClick = onEditarClick
             ) {
-                Text("Editar")
+                Text(
+                    text = "Editar",
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
             TextButton(
                 onClick = onBorrarClick
             ) {
-                Text("Borrar")
+                Text(
+                    text = "Borrar",
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         }
     }
