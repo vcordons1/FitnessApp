@@ -10,6 +10,9 @@ import com.v1k70r.fitnessapp.data.entity.WorkoutSessionEntity
 import com.v1k70r.fitnessapp.data.local.dao.LoggedExerciseDao
 import com.v1k70r.fitnessapp.data.local.steps.StepDao
 import com.v1k70r.fitnessapp.data.local.steps.StepEntity
+import com.v1k70r.fitnessapp.data.local.nutrition.FoodEntity
+import com.v1k70r.fitnessapp.data.local.nutrition.NutritionDao
+import com.v1k70r.fitnessapp.data.local.nutrition.NutritionEntryEntity
 
 
 @Database(
@@ -17,9 +20,11 @@ import com.v1k70r.fitnessapp.data.local.steps.StepEntity
         WorkoutSessionEntity::class,
         LoggedExerciseEntity::class,
         ExerciseSetEntity::class,
-        StepEntity::class
+        StepEntity::class,
+        FoodEntity::class,
+        NutritionEntryEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class FitnessDatabase : RoomDatabase() {
@@ -47,4 +52,6 @@ abstract class FitnessDatabase : RoomDatabase() {
             }
         }
     }
+
+    abstract fun nutritionDao(): NutritionDao
 }

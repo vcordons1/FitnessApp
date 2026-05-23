@@ -3,69 +3,146 @@ package com.v1k70r.fitnessapp.ui.screens.nutrition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.v1k70r.fitnessapp.domain.model.MealType
+import com.v1k70r.fitnessapp.ui.screens.nutrition.components.FoodSearchBottomSheet
+import com.v1k70r.fitnessapp.ui.screens.nutrition.components.MealCategoryCard
+import com.v1k70r.fitnessapp.ui.screens.nutrition.components.NutritionSummaryCard
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NutritionScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        Text(
-            text = "Nutrición",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        MacroCard("Calorías", "1,840 / 2,400 kcal", 0.76f)
-        MacroCard("Proteínas", "120 / 160 g", 0.75f)
-        MacroCard("Carbohidratos", "210 / 300 g", 0.70f)
-        MacroCard("Grasas", "55 / 80 g", 0.68f)
-    }
-}
-
-@Composable
-fun MacroCard(
-    title: String,
-    value: String,
-    progress: Float
+fun NutritionScreen(
+    nutritionViewModel: NutritionViewModel = viewModel()
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+    val state = nutritionViewModel.uiState
+    var showFoodSheet by remember { mutableStateOf(false) }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showFoodSheet = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Agregar alimento"
+                )
+            }
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = "Nutrición",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold
+                    )
 
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                    Text(
+                        text = "Registra alimentos y controla tus macros del día.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
-            LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            item {
+                NutritionSummaryCard(state = state)
+            }
+
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = "Agregar en",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    SingleChoiceSegmentedButtonRow {
+                        MealType.entries.forEachIndexed { index, mealType ->
+                            SegmentedButton(
+                                selected = state.selectedMealType == mealType,
+                                onClick = { nutritionViewModel.selectMealType(mealType) },
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = MealType.entries.size
+                                )
+                            ) {
+                                Text(mealType.label)
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                Text(
+                    text = "Comidas de hoy",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            MealType.entries.forEach { mealType ->
+                item {
+                    MealCategoryCard(
+                        mealType = mealType,
+                        entries = nutritionViewModel.entriesByMealType(mealType),
+                        onDeleteEntry = nutritionViewModel::deleteEntry
+                    )
+                }
+            }
+        }
+
+        if (showFoodSheet) {
+            FoodSearchBottomSheet(
+                mealType = state.selectedMealType,
+                searchQuery = state.searchQuery,
+                gramsInput = state.gramsInput,
+                selectedFood = state.selectedFood,
+                foods = nutritionViewModel.filteredFoods,
+                onDismiss = { showFoodSheet = false },
+                onSearchChange = nutritionViewModel::onSearchChange,
+                onGramsChange = nutritionViewModel::onGramsChange,
+                onFoodSelected = nutritionViewModel::selectFood,
+                onAddFood = {
+                    nutritionViewModel.addSelectedFood()
+                    showFoodSheet = false
+                }
             )
         }
     }
