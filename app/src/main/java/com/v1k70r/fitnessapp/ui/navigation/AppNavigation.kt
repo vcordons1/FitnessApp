@@ -18,6 +18,7 @@ import com.v1k70r.fitnessapp.ui.screens.nutrition.NutritionScreen
 import com.v1k70r.fitnessapp.ui.screens.pedometer.PedometerScreen
 import com.v1k70r.fitnessapp.ui.screens.training.TrainingViewModel
 import com.v1k70r.fitnessapp.ui.screens.pedometer.PedometerViewModel
+import com.v1k70r.fitnessapp.ui.screens.nutrition.NutritionViewModel
 
 @Composable
 fun AppNavigation(
@@ -48,6 +49,14 @@ fun AppNavigation(
         }
     )
 
+    val nutritionViewModel: NutritionViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return NutritionViewModel(context) as T
+            }
+        }
+    )
+
     NavHost(
         navController = navController,
         startDestination = Screen.Dashboard.route,
@@ -56,7 +65,8 @@ fun AppNavigation(
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 trainingViewModel = trainingViewModel,
-                pedometerViewModel = pedometerViewModel
+                pedometerViewModel = pedometerViewModel,
+                nutritionViewModel = nutritionViewModel
             )
         }
 

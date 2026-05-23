@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
@@ -22,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.v1k70r.fitnessapp.ui.screens.nutrition.NutritionViewModel
 import com.v1k70r.fitnessapp.ui.screens.pedometer.PedometerViewModel
 import com.v1k70r.fitnessapp.ui.screens.training.TrainingViewModel
 import java.util.Calendar
@@ -29,10 +27,12 @@ import java.util.Calendar
 @Composable
 fun DashboardScreen(
     trainingViewModel: TrainingViewModel,
-    pedometerViewModel: PedometerViewModel
+    pedometerViewModel: PedometerViewModel,
+    nutritionViewModel: NutritionViewModel
 ) {
     val sesionesEntrenamiento by trainingViewModel.sesionesEntrenamiento.collectAsState()
     val pasosState by pedometerViewModel.uiState.collectAsState()
+    val nutritionState = nutritionViewModel.uiState
 
     val sesionActivaHoy = sesionesEntrenamiento.firstOrNull { session ->
         session.endedAt == null && esHoy(session.startedAt)
@@ -40,8 +40,28 @@ fun DashboardScreen(
 
     val ejerciciosRegistrados = sesionActivaHoy?.exercises?.size ?: 0
     val seriesTotales = sesionActivaHoy?.exercises?.sumOf { it.sets.size } ?: 0
-    val ultimoEjercicio = sesionActivaHoy?.exercises?.lastOrNull()?.exerciseName
+
+    val ultimoEjercicio = sesionActivaHoy
+        ?.exercises
+        ?.lastOrNull()
+        ?.exerciseName
         ?: "Sin ejercicios registrados"
+
+    val caloriasConsumidas = nutritionState.entries.sumOf { entry ->
+        (entry.food.caloriesPer100g * entry.grams) / 100
+    }
+
+    val proteina = nutritionState.entries.sumOf { entry ->
+        (entry.food.proteinPer100g * entry.grams) / 100.0
+    }
+
+    val carbohidratos = nutritionState.entries.sumOf { entry ->
+        (entry.food.carbsPer100g * entry.grams) / 100.0
+    }
+
+    val grasas = nutritionState.entries.sumOf { entry ->
+        (entry.food.fatsPer100g * entry.grams) / 100.0
+    }
 
     Column(
         modifier = Modifier
@@ -63,6 +83,13 @@ fun DashboardScreen(
             calorias = pasosState.calories,
             distanciaKm = pasosState.distanceKm,
             pausado = pasosState.isPaused
+        )
+
+        DashboardNutricionCard(
+            calorias = caloriasConsumidas,
+            proteina = proteina,
+            carbohidratos = carbohidratos,
+            grasas = grasas
         )
 
         DashboardEntrenoCard(
@@ -139,6 +166,63 @@ private fun DashboardPasosCard(
                 text = if (pausado) "Conteo pausado" else "Conteo activo",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun DashboardNutricionCard(
+    calorias: Int,
+    proteina: Double,
+    carbohidratos: Double,
+    grasas: Double
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(22.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "Nutrición",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = "$calorias kcal consumidas hoy",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DashboardMiniCard(
+                    modifier = Modifier.weight(1f),
+                    titulo = "Proteína",
+                    valor = "%.1f g".format(proteina)
+                )
+
+                DashboardMiniCard(
+                    modifier = Modifier.weight(1f),
+                    titulo = "Carbs",
+                    valor = "%.1f g".format(carbohidratos)
+                )
+            }
+
+            DashboardMiniCard(
+                modifier = Modifier.fillMaxWidth(),
+                titulo = "Grasas",
+                valor = "%.1f g".format(grasas)
             )
         }
     }
