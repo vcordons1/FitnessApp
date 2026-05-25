@@ -64,7 +64,7 @@ fun ResumenDiarioPasos(
             Text(
                 text = "Meta diaria: $goal pasos",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.primary
             )
 
             Row(

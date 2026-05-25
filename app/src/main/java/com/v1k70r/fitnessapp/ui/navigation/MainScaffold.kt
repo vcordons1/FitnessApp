@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalDining
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +39,8 @@ fun MainScaffold(
         Screen.Dashboard,
         Screen.Training,
         Screen.Nutrition,
-        Screen.Pedometer
+        Screen.Pedometer,
+        Screen.Profile
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -91,6 +93,7 @@ fun MainScaffold(
                                     Screen.Training -> Icons.Default.FitnessCenter
                                     Screen.Nutrition -> Icons.Default.LocalDining
                                     Screen.Pedometer -> Icons.Default.DirectionsWalk
+                                    Screen.Profile -> Icons.Default.Person
                                 },
                                 contentDescription = screen.title
                             )

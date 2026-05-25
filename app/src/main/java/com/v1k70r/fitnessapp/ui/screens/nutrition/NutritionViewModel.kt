@@ -1,6 +1,7 @@
 package com.v1k70r.fitnessapp.ui.screens.nutrition
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.v1k70r.fitnessapp.data.local.FitnessDatabase
@@ -24,6 +25,8 @@ class NutritionViewModel(
 
     private var allFoods: List<FoodItem> = emptyList()
 
+    private val prefs = application.getSharedPreferences("nutrition_prefs", Context.MODE_PRIVATE)
+
     private val _uiState = MutableStateFlow(NutritionUiState())
     val uiState: StateFlow<NutritionUiState> = _uiState.asStateFlow()
 
@@ -33,6 +36,12 @@ class NutritionViewModel(
 
         repository = NutritionRepository(
             database.nutritionDao()
+        )
+
+        _uiState.value = _uiState.value.copy(
+            proteinGoal = prefs.getFloat("protein_goal", 200f).toDouble(),
+            carbsGoal = prefs.getFloat("carbs_goal", 400f).toDouble(),
+            fatsGoal = prefs.getFloat("fats_goal", 80f).toDouble()
         )
 
         initializeNutrition()
@@ -153,5 +162,23 @@ class NutritionViewModel(
         return _uiState.value.entries.filter {
             it.mealType == mealType
         }
+    }
+
+    fun setProteinGoal(goal: Double) {
+        val clamped = goal.coerceIn(0.0, 1000.0)
+        _uiState.value = _uiState.value.copy(proteinGoal = clamped)
+        prefs.edit().putFloat("protein_goal", clamped.toFloat()).apply()
+    }
+
+    fun setCarbsGoal(goal: Double) {
+        val clamped = goal.coerceIn(0.0, 2000.0)
+        _uiState.value = _uiState.value.copy(carbsGoal = clamped)
+        prefs.edit().putFloat("carbs_goal", clamped.toFloat()).apply()
+    }
+
+    fun setFatsGoal(goal: Double) {
+        val clamped = goal.coerceIn(0.0, 500.0)
+        _uiState.value = _uiState.value.copy(fatsGoal = clamped)
+        prefs.edit().putFloat("fats_goal", clamped.toFloat()).apply()
     }
 }

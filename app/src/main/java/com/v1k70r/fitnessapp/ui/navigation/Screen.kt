@@ -8,4 +8,5 @@ sealed class Screen(
     data object Training : Screen("training", "Entreno")
     data object Nutrition : Screen("nutrition", "Nutrición")
     data object Pedometer : Screen("pedometer", "Pasos")
+    data object Profile : Screen("profile", "Perfil")
 }

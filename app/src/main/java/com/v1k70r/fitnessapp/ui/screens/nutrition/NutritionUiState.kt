@@ -9,17 +9,16 @@ data class NutritionUiState(
     val selectedMealType: MealType = MealType.BREAKFAST,
     val searchQuery: String = "",
     val selectedFood: FoodItem? = null,
-    val gramsInput: String = "100"
-) {
-    val calorieGoal: Int = 3300
-    val proteinGoal: Double = 200.0
-    val carbsGoal: Double = 400.0
+    val gramsInput: String = "100",
+    val proteinGoal: Double = 200.0,
+    val carbsGoal: Double = 400.0,
     val fatsGoal: Double = 80.0
-
+) {
     val totalCalories: Int get() = entries.sumOf { it.calories }
     val totalProtein: Double get() = entries.sumOf { it.protein }
     val totalCarbs: Double get() = entries.sumOf { it.carbs }
     val totalFats: Double get() = entries.sumOf { it.fats }
 
+    val calorieGoal: Int get() = (proteinGoal * 4 + carbsGoal * 4 + fatsGoal * 9).toInt()
     val remainingCalories: Int get() = calorieGoal - totalCalories
 }

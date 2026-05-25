@@ -1,6 +1,7 @@
 package com.v1k70r.fitnessapp.ui.screens.pedometer
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.v1k70r.fitnessapp.data.local.FitnessDatabase
@@ -23,6 +24,8 @@ class PedometerViewModel(
         stepDao = database.stepDao()
     )
 
+    private val prefs = application.getSharedPreferences("pedometer_prefs", Context.MODE_PRIVATE)
+
     private val _uiState = MutableStateFlow(PedometerUiState())
     val uiState: StateFlow<PedometerUiState> = _uiState.asStateFlow()
 
@@ -30,9 +33,9 @@ class PedometerViewModel(
     private var lastSensorSteps: Int = 0
     private var activeDate: String = LocalDate.now().toString()
 
-    private val dailyGoal = 10000
-
     init {
+        val savedGoal = prefs.getInt("daily_goal", 10000)
+        _uiState.value = _uiState.value.copy(dailyGoal = savedGoal)
         loadStoredSteps()
         observeHistory()
     }
@@ -57,7 +60,7 @@ class PedometerViewModel(
                     steps = 0,
                     baseSensorSteps = sensorSteps,
                     lastSensorSteps = sensorSteps,
-                    goal = dailyGoal,
+                    goal = _uiState.value.dailyGoal,
                     isPaused = false,
                     pauseStartSensorSteps = null,
                     pausedStepsOffset = 0
@@ -84,7 +87,7 @@ class PedometerViewModel(
                     steps = 0,
                     baseSensorSteps = sensorSteps,
                     lastSensorSteps = sensorSteps,
-                    goal = dailyGoal,
+                    goal = _uiState.value.dailyGoal,
                     isPaused = false,
                     pauseStartSensorSteps = null,
                     pausedStepsOffset = 0
@@ -118,7 +121,7 @@ class PedometerViewModel(
                 steps = currentSteps,
                 baseSensorSteps = base,
                 lastSensorSteps = sensorSteps,
-                goal = dailyGoal,
+                goal = _uiState.value.dailyGoal,
                 isPaused = _uiState.value.isPaused,
                 pauseStartSensorSteps = _uiState.value.pauseStartSensorSteps,
                 pausedStepsOffset = _uiState.value.pausedStepsOffset
@@ -144,7 +147,7 @@ class PedometerViewModel(
                     steps = currentState.todaySteps,
                     baseSensorSteps = base,
                     lastSensorSteps = lastSensorSteps,
-                    goal = dailyGoal,
+                    goal = _uiState.value.dailyGoal,
                     isPaused = true,
                     pauseStartSensorSteps = lastSensorSteps,
                     pausedStepsOffset = currentState.pausedStepsOffset
@@ -168,13 +171,20 @@ class PedometerViewModel(
                     steps = currentState.todaySteps,
                     baseSensorSteps = base,
                     lastSensorSteps = lastSensorSteps,
-                    goal = dailyGoal,
+                    goal = _uiState.value.dailyGoal,
                     isPaused = false,
                     pauseStartSensorSteps = null,
                     pausedStepsOffset = newOffset
                 )
             }
         }
+    }
+
+    fun changeGoal(newGoal: Int) {
+        val clamped = newGoal.coerceIn(1000, 100000)
+        _uiState.value = _uiState.value.copy(dailyGoal = clamped)
+        prefs.edit().putInt("daily_goal", clamped).apply()
+        updateStateWithTodaySteps(_uiState.value.todaySteps)
     }
 
     fun changePeriod(period: PedometerPeriod) {
@@ -253,11 +263,12 @@ class PedometerViewModel(
     private fun updateStateWithTodaySteps(steps: Int) {
         val distanceKm = steps * 0.0008
         val calories = (steps * 0.04).toInt()
-        val progress = (steps.toFloat() / dailyGoal).coerceIn(0f, 1f)
+        val progress = (steps.toFloat() / _uiState.value.dailyGoal).coerceIn(0f, 1f)
 
+        val goal = _uiState.value.dailyGoal
         _uiState.value = _uiState.value.copy(
             todaySteps = steps,
-            dailyGoal = dailyGoal,
+            dailyGoal = goal,
             distanceKm = distanceKm,
             calories = calories,
             progress = progress

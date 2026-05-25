@@ -19,6 +19,7 @@ import com.v1k70r.fitnessapp.ui.screens.pedometer.PedometerScreen
 import com.v1k70r.fitnessapp.ui.screens.training.TrainingViewModel
 import com.v1k70r.fitnessapp.ui.screens.pedometer.PedometerViewModel
 import com.v1k70r.fitnessapp.ui.screens.nutrition.NutritionViewModel
+import com.v1k70r.fitnessapp.ui.screens.profile.ProfileScreen
 
 @Composable
 fun AppNavigation(
@@ -80,12 +81,21 @@ fun AppNavigation(
         }
 
         composable(Screen.Nutrition.route) {
-            NutritionScreen()
+            NutritionScreen(
+                nutritionViewModel = nutritionViewModel
+            )
         }
 
         composable(Screen.Pedometer.route) {
             PedometerScreen(
                 viewModel = pedometerViewModel
+            )
+        }
+
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                pedometerViewModel = pedometerViewModel,
+                nutritionViewModel = nutritionViewModel
             )
         }
     }

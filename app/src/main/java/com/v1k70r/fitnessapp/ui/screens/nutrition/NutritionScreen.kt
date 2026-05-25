@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,7 +37,7 @@ import com.v1k70r.fitnessapp.ui.screens.nutrition.components.NutritionSummaryCar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NutritionScreen(
-    nutritionViewModel: NutritionViewModel = viewModel()
+    nutritionViewModel: NutritionViewModel
 ) {
     val state by nutritionViewModel.uiState.collectAsState()
     var showFoodSheet by remember { mutableStateOf(false) }
