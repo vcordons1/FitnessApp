@@ -1,9 +1,13 @@
 package com.v1k70r.fitnessapp.ui.screens.nutrition
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,6 +20,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +40,7 @@ import com.v1k70r.fitnessapp.ui.screens.nutrition.components.NutritionSummaryCar
 fun NutritionScreen(
     nutritionViewModel: NutritionViewModel = viewModel()
 ) {
-    val state = nutritionViewModel.uiState
+    val state by nutritionViewModel.uiState.collectAsState()
     var showFoodSheet by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -57,13 +62,13 @@ fun NutritionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            contentPadding = PaddingValues(
                 start = 20.dp,
-                top = 24.dp,
+                top = 20.dp,
                 end = 20.dp,
-                bottom = 110.dp
+                bottom = 100.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(22.dp)
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             item {
                 Column(
@@ -97,17 +102,21 @@ fun NutritionScreen(
                         fontWeight = FontWeight.Bold
                     )
 
-                    SingleChoiceSegmentedButtonRow {
-                        MealType.entries.forEachIndexed { index, mealType ->
-                            SegmentedButton(
-                                selected = state.selectedMealType == mealType,
-                                onClick = { nutritionViewModel.selectMealType(mealType) },
-                                shape = SegmentedButtonDefaults.itemShape(
-                                    index = index,
-                                    count = MealType.entries.size
-                                )
-                            ) {
-                                Text(mealType.label)
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
+                        SingleChoiceSegmentedButtonRow {
+                            MealType.entries.forEachIndexed { index, mealType ->
+                                SegmentedButton(
+                                    selected = state.selectedMealType == mealType,
+                                    onClick = { nutritionViewModel.selectMealType(mealType) },
+                                    shape = SegmentedButtonDefaults.itemShape(
+                                        index = index,
+                                        count = MealType.entries.size
+                                    )
+                                ) {
+                                    Text(mealType.label)
+                                }
                             }
                         }
                     }
@@ -139,7 +148,7 @@ fun NutritionScreen(
                 searchQuery = state.searchQuery,
                 gramsInput = state.gramsInput,
                 selectedFood = state.selectedFood,
-                foods = nutritionViewModel.filteredFoods,
+                foods = nutritionViewModel.filteredFoods(state.searchQuery),
                 onDismiss = { showFoodSheet = false },
                 onSearchChange = nutritionViewModel::onSearchChange,
                 onGramsChange = nutritionViewModel::onGramsChange,

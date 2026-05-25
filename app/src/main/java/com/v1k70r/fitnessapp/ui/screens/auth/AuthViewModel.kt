@@ -1,12 +1,12 @@
 package com.v1k70r.fitnessapp.ui.screens.auth
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.auth.FacebookAuthProvider
@@ -15,25 +15,25 @@ class AuthViewModel : ViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
 
-    var uiState by mutableStateOf(
+    private val _uiState = MutableStateFlow(
         AuthUiState(isAuthenticated = auth.currentUser != null)
     )
-        private set
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
     fun iniciarSesionConEmail(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            uiState = uiState.copy(errorMessage = "Completa todos los campos.")
+            _uiState.value = _uiState.value.copy(errorMessage = "Completa todos los campos.")
             return
         }
 
         viewModelScope.launch {
-            uiState = AuthUiState(isLoading = true)
+            _uiState.value = AuthUiState(isLoading = true)
 
             try {
                 auth.signInWithEmailAndPassword(email.trim(), password).await()
-                uiState = AuthUiState(isAuthenticated = true)
+                _uiState.value = AuthUiState(isAuthenticated = true)
             } catch (e: Exception) {
-                uiState = AuthUiState(
+                _uiState.value = AuthUiState(
                     errorMessage = e.localizedMessage ?: "Error al iniciar sesión."
                 )
             }
@@ -42,23 +42,23 @@ class AuthViewModel : ViewModel() {
 
     fun crearCuentaConEmail(email: String, password: String, confirmPassword: String) {
         if (email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
-            uiState = uiState.copy(errorMessage = "Completa todos los campos.")
+            _uiState.value = _uiState.value.copy(errorMessage = "Completa todos los campos.")
             return
         }
 
         if (password != confirmPassword) {
-            uiState = uiState.copy(errorMessage = "Las contraseñas no coinciden.")
+            _uiState.value = _uiState.value.copy(errorMessage = "Las contraseñas no coinciden.")
             return
         }
 
         viewModelScope.launch {
-            uiState = AuthUiState(isLoading = true)
+            _uiState.value = AuthUiState(isLoading = true)
 
             try {
                 auth.createUserWithEmailAndPassword(email.trim(), password).await()
-                uiState = AuthUiState(isAuthenticated = true)
+                _uiState.value = AuthUiState(isAuthenticated = true)
             } catch (e: Exception) {
-                uiState = AuthUiState(
+                _uiState.value = AuthUiState(
                     errorMessage = e.localizedMessage ?: "Error al crear la cuenta."
                 )
             }
@@ -67,14 +67,14 @@ class AuthViewModel : ViewModel() {
 
     fun iniciarSesionConGoogle(idToken: String) {
         viewModelScope.launch {
-            uiState = AuthUiState(isLoading = true)
+            _uiState.value = AuthUiState(isLoading = true)
 
             try {
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
                 auth.signInWithCredential(credential).await()
-                uiState = AuthUiState(isAuthenticated = true)
+                _uiState.value = AuthUiState(isAuthenticated = true)
             } catch (e: Exception) {
-                uiState = AuthUiState(
+                _uiState.value = AuthUiState(
                     errorMessage = e.localizedMessage ?: "Error al iniciar con Google."
                 )
             }
@@ -82,11 +82,11 @@ class AuthViewModel : ViewModel() {
     }
 
     fun limpiarError() {
-        uiState = uiState.copy(errorMessage = null)
+        _uiState.value = _uiState.value.copy(errorMessage = null)
     }
 
     fun mostrarError(message: String) {
-        uiState = uiState.copy(
+        _uiState.value = _uiState.value.copy(
             isLoading = false,
             errorMessage = message
         )
@@ -94,14 +94,14 @@ class AuthViewModel : ViewModel() {
 
     fun cerrarSesion() {
         auth.signOut()
-        uiState = AuthUiState(isAuthenticated = false)
+        _uiState.value = AuthUiState(isAuthenticated = false)
     }
 
     fun iniciarSesionConFacebook(token: String) {
 
         viewModelScope.launch {
 
-            uiState = AuthUiState(isLoading = true)
+            _uiState.value = AuthUiState(isLoading = true)
 
             try {
 
@@ -109,13 +109,13 @@ class AuthViewModel : ViewModel() {
 
                 auth.signInWithCredential(credential).await()
 
-                uiState = AuthUiState(
+                _uiState.value = AuthUiState(
                     isAuthenticated = true
                 )
 
             } catch (e: Exception) {
 
-                uiState = AuthUiState(
+                _uiState.value = AuthUiState(
                     errorMessage = e.localizedMessage
                         ?: "Error al iniciar sesión con Facebook."
                 )

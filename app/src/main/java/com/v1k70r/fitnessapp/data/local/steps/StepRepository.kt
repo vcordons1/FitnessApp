@@ -1,7 +1,5 @@
-package com.v1k70r.fitnessapp.ui.screens.pedometer.data
+package com.v1k70r.fitnessapp.data.local.steps
 
-import com.v1k70r.fitnessapp.data.local.steps.StepDao
-import com.v1k70r.fitnessapp.data.local.steps.StepEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

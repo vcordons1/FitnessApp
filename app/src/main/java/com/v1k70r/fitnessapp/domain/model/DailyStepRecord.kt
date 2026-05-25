@@ -1,4 +1,4 @@
-package com.v1k70r.fitnessapp.ui.screens.pedometer.data
+package com.v1k70r.fitnessapp.domain.model
 
 data class DailyStepRecord(
     val date: String,

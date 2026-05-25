@@ -3,7 +3,6 @@ package com.v1k70r.fitnessapp.ui.screens.pedometer
 import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.v1k70r.fitnessapp.ui.screens.pedometer.components.BotonPausaPasos
 import com.v1k70r.fitnessapp.ui.screens.pedometer.components.ResumenDiarioPasos
@@ -83,14 +83,15 @@ fun PedometerScreen(
 
             contentPadding = PaddingValues(20.dp),
 
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
             item {
 
                 Text(
                     text = "Pasos",
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold
                 )
             }
 

@@ -35,20 +35,20 @@ fun ResumenDiarioPasos(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Pasos de hoy",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             CircularProgressIndicator(
                 progress = { progress },
-                modifier = Modifier.size(150.dp),
+                modifier = Modifier.size(130.dp),
                 strokeWidth = 12.dp,
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
@@ -56,20 +56,20 @@ fun ResumenDiarioPasos(
 
             Text(
                 text = "$steps",
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = "Meta diaria: $goal pasos",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 TarjetaMetricaPasos(
                     title = "Calorías",

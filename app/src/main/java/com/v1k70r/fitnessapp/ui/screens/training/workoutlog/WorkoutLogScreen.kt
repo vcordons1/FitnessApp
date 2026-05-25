@@ -1,33 +1,28 @@
 package com.v1k70r.fitnessapp.ui.screens.training.workoutlog
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.v1k70r.fitnessapp.ui.navigation.TrainingRoutes
 import com.v1k70r.fitnessapp.ui.screens.training.TrainingViewModel
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.HorizontalDivider
 import com.v1k70r.fitnessapp.ui.screens.training.workoutlog.components.SesionEntrenamientoCard
 
 @Composable
@@ -44,111 +39,114 @@ fun WorkoutLogScreen(
         formatearFecha(session.startedAt)
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .padding(horizontal = 20.dp, vertical = 24.dp),
+        contentPadding = PaddingValues(top = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "Registro de entrenamiento",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Text(
-            text = "Aquí se mostrarán tus entrenamientos registrados",
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        Button(
-            onClick = {
-                navController.navigate(TrainingRoutes.Categories.route)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Agregar ejercicio")
+        item {
+            Text(
+                text = "Registro de entrenamiento",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
         }
 
-        Button(
-            onClick = {
-                trainingViewModel.finalizarSesionActiva()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Finalizar entrenamiento")
+        item {
+            Button(
+                onClick = {
+                    navController.navigate(TrainingRoutes.Categories.route)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(text = "Agregar ejercicio")
+            }
         }
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            sesionesPorDia.forEach { (fecha, sesionesDelDia) ->
+        item {
+            Button(
+                onClick = {
+                    trainingViewModel.finalizarSesionActiva()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Finalizar entrenamiento")
+            }
+        }
 
-                item {
-                    Text(
-                        text = fecha,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
+        sesionesPorDia.forEach { (fecha, sesionesDelDia) ->
 
-                items(sesionesDelDia) { sesion ->
+            item {
+                Text(
+                    text = fecha,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
-                    SesionEntrenamientoCard(
-                        sesion = sesion,
-                        serieEditandoId = serieEditandoId,
-                        pesoEditado = pesoEditado,
-                        repeticionesEditadas = repeticionesEditadas,
-                        onPesoEditadoChange = { pesoEditado = it },
-                        onRepeticionesEditadasChange = { repeticionesEditadas = it },
-                        onEditarSerieClick = { serieId, peso, repeticiones ->
-                            serieEditandoId = serieId
-                            pesoEditado = peso
-                            repeticionesEditadas = repeticiones
-                        },
-                        onGuardarSerieClick = { serieId, ejercicioRegistradoId, numeroSerie ->
-                            trainingViewModel.actualizarSerieGuardada(
-                                serieId = serieId,
-                                ejercicioRegistradoId = ejercicioRegistradoId,
-                                numeroSerie = numeroSerie,
-                                peso = pesoEditado,
-                                repeticiones = repeticionesEditadas
-                            )
+            items(sesionesDelDia, key = { it.id }) { sesion ->
 
+                SesionEntrenamientoCard(
+                    sesion = sesion,
+                    serieEditandoId = serieEditandoId,
+                    pesoEditado = pesoEditado,
+                    repeticionesEditadas = repeticionesEditadas,
+                    onPesoEditadoChange = { pesoEditado = it },
+                    onRepeticionesEditadasChange = { repeticionesEditadas = it },
+                    onEditarSerieClick = { serieId, peso, repeticiones ->
+                        serieEditandoId = serieId
+                        pesoEditado = peso
+                        repeticionesEditadas = repeticiones
+                    },
+                    onGuardarSerieClick = { serieId, ejercicioRegistradoId, numeroSerie ->
+                        trainingViewModel.actualizarSerieGuardada(
+                            serieId = serieId,
+                            ejercicioRegistradoId = ejercicioRegistradoId,
+                            numeroSerie = numeroSerie,
+                            peso = pesoEditado,
+                            repeticiones = repeticionesEditadas
+                        )
+
+                        serieEditandoId = null
+                        pesoEditado = ""
+                        repeticionesEditadas = ""
+                    },
+                    onCancelarEdicionClick = {
+                        serieEditandoId = null
+                        pesoEditado = ""
+                        repeticionesEditadas = ""
+                    },
+                    onBorrarSerieClick = { serieId ->
+                        trainingViewModel.borrarSerieGuardada(serieId)
+
+                        if (serieEditandoId == serieId) {
                             serieEditandoId = null
                             pesoEditado = ""
                             repeticionesEditadas = ""
-                        },
-                        onCancelarEdicionClick = {
-                            serieEditandoId = null
-                            pesoEditado = ""
-                            repeticionesEditadas = ""
-                        },
-                        onBorrarSerieClick = { serieId ->
-                            trainingViewModel.borrarSerieGuardada(serieId)
-
-                            if (serieEditandoId == serieId) {
-                                serieEditandoId = null
-                                pesoEditado = ""
-                                repeticionesEditadas = ""
-                            }
-                        },
-                        onBorrarSesionClick = {
-                            trainingViewModel.borrarSesionEntrenamiento(sesion.id)
-                        },
-                        onBorrarEjercicioClick = { ejercicioRegistradoId ->
-                            trainingViewModel.borrarEjercicioRegistrado(ejercicioRegistradoId)
                         }
-                    )
-                }
+                    },
+                    onBorrarSesionClick = {
+                        trainingViewModel.borrarSesionEntrenamiento(sesion.id)
+                    },
+                    onBorrarEjercicioClick = { ejercicioRegistradoId ->
+                        trainingViewModel.borrarEjercicioRegistrado(ejercicioRegistradoId)
+                    }
+                )
             }
         }
     }
 }
 
 private fun formatearFecha(timestamp: Long): String {
-    val formatter = java.text.SimpleDateFormat(
-        "dd/MM/yyyy",
-        java.util.Locale("es", "ES")
-    )
+    val formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        .withLocale(java.util.Locale("es", "ES"))
 
-    return formatter.format(java.util.Date(timestamp))
+    return java.time.Instant.ofEpochMilli(timestamp)
+        .atZone(java.time.ZoneId.systemDefault())
+        .toLocalDate()
+        .format(formatter)
 }

@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.v1k70r.fitnessapp.data.local.FitnessDatabase
-import com.v1k70r.fitnessapp.ui.screens.pedometer.data.DailyStepRecord
-import com.v1k70r.fitnessapp.ui.screens.pedometer.data.StepRepository
+import com.v1k70r.fitnessapp.data.local.steps.StepRepository
+import com.v1k70r.fitnessapp.domain.model.DailyStepRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

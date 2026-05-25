@@ -16,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,7 +54,7 @@ fun AuthScreen(
 ) {
     val context = LocalContext.current
     val activity = context as Activity
-    val uiState = authViewModel.uiState
+    val uiState by authViewModel.uiState.collectAsState()
 
     var authMode by remember { mutableStateOf(AuthMode.Login) }
     var email by remember { mutableStateOf("") }
@@ -116,15 +118,16 @@ fun AuthScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
+                    .imePadding()
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Box(
                     modifier = Modifier
-                        .size(92.dp)
+                        .size(80.dp)
                         .background(
                             color = MaterialTheme.colorScheme.primaryContainer,
                             shape = CircleShape
@@ -139,17 +142,17 @@ fun AuthScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = if (authMode == AuthMode.Login) "Bienvenido de vuelta" else "Crea tu cuenta",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = if (authMode == AuthMode.Login) {
@@ -162,7 +165,7 @@ fun AuthScreen(
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -177,7 +180,7 @@ fun AuthScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(22.dp),
+                            .padding(20.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
@@ -187,7 +190,7 @@ fun AuthScreen(
                             onValueChange = { email = it }
                         )
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         AuthTextField(
                             value = password,
@@ -197,7 +200,7 @@ fun AuthScreen(
                         )
 
                         if (authMode == AuthMode.Register) {
-                            Spacer(modifier = Modifier.height(14.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
                             AuthTextField(
                                 value = confirmPassword,
@@ -208,7 +211,7 @@ fun AuthScreen(
                         }
 
                         if (authMode == AuthMode.Login) {
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             Text(
                                 text = "¿Olvidaste tu contraseña?",
@@ -218,7 +221,7 @@ fun AuthScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(22.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         AuthPrimaryButton(
                             text = if (authMode == AuthMode.Login) "Iniciar sesión" else "Crear cuenta",
@@ -236,7 +239,7 @@ fun AuthScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(18.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
                             text = if (authMode == AuthMode.Login) {
@@ -256,7 +259,7 @@ fun AuthScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -273,10 +276,11 @@ fun AuthScreen(
                             HorizontalDivider(modifier = Modifier.weight(1f))
                         }
 
-                        Spacer(modifier = Modifier.height(18.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             SocialLoginButton(
@@ -284,8 +288,11 @@ fun AuthScreen(
                                 onClick = {
                                     googleSignInClient.signOut()
                                     googleLauncher.launch(googleSignInClient.signInIntent)
-                                }
+                                },
+                                modifier = Modifier.weight(1f)
                             )
+
+                            Spacer(modifier = Modifier.width(14.dp))
 
                             FacebookLoginButton(
                                 onTokenReceived = { token ->
@@ -293,12 +300,13 @@ fun AuthScreen(
                                 },
                                 onError = { error ->
                                     authViewModel.mostrarError(error)
-                                }
+                                },
+                                modifier = Modifier.weight(1f)
                             )
                         }
 
                         uiState.errorMessage?.let { message ->
-                            Spacer(modifier = Modifier.height(18.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             Text(
                                 text = message,
@@ -310,13 +318,15 @@ fun AuthScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
                     text = "FitnessApp",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -338,7 +348,8 @@ private fun buildGoogleSignInClient(
 @Composable
 private fun FacebookLoginButton(
     onTokenReceived: (String) -> Unit,
-    onError: (String) -> Unit
+    onError: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val activity = context as Activity
@@ -378,6 +389,6 @@ private fun FacebookLoginButton(
                 listOf("email", "public_profile")
             )
         },
-        modifier = Modifier.width(150.dp)
+        modifier = modifier
     )
 }

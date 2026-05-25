@@ -23,8 +23,8 @@ fun TarjetaMetricaPasos(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.height(92.dp),
-        shape = RoundedCornerShape(24.dp),
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -33,7 +33,7 @@ fun TarjetaMetricaPasos(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(14.dp),
+                .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

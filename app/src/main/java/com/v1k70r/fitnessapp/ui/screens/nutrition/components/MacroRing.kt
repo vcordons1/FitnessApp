@@ -16,24 +16,27 @@ import androidx.compose.ui.unit.dp
 fun MacroRing(
     progress: Float,
     modifier: Modifier = Modifier,
+    ringDp: Int = 120,
     content: @Composable () -> Unit
 ) {
     val trackColor = MaterialTheme.colorScheme.surfaceVariant
     val progressColor = MaterialTheme.colorScheme.primary
+    val ringSize = ringDp.dp
 
     Box(
-        modifier = modifier.size(170.dp),
+        modifier = modifier.size(ringSize),
         contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.size(170.dp)) {
+        Canvas(modifier = Modifier.size(ringSize)) {
             val stroke = 16.dp.toPx()
+            val canvasSize = this.size
 
             drawArc(
                 color = trackColor,
                 startAngle = -90f,
                 sweepAngle = 360f,
                 useCenter = false,
-                size = Size(size.width, size.height),
+                size = canvasSize,
                 style = Stroke(width = stroke, cap = StrokeCap.Round)
             )
 
@@ -42,7 +45,7 @@ fun MacroRing(
                 startAngle = -90f,
                 sweepAngle = 360f * progress.coerceIn(0f, 1f),
                 useCenter = false,
-                size = Size(size.width, size.height),
+                size = canvasSize,
                 style = Stroke(width = stroke, cap = StrokeCap.Round)
             )
         }

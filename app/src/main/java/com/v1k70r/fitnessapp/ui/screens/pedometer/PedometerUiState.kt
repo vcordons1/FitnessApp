@@ -1,6 +1,6 @@
 package com.v1k70r.fitnessapp.ui.screens.pedometer
 
-import com.v1k70r.fitnessapp.ui.screens.pedometer.data.DailyStepRecord
+import com.v1k70r.fitnessapp.domain.model.DailyStepRecord
 
 data class PedometerUiState(
     val selectedPeriod: PedometerPeriod = PedometerPeriod.DIA,

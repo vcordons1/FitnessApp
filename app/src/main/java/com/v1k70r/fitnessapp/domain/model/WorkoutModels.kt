@@ -1,5 +1,4 @@
 package com.v1k70r.fitnessapp.domain.model
-import com.v1k70r.fitnessapp.MainActivity
 
 data class WorkoutSession(
     val id: Long,

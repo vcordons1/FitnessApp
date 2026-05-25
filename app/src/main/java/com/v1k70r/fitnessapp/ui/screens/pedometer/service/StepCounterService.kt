@@ -18,7 +18,7 @@ import androidx.core.app.NotificationCompat
 import com.v1k70r.fitnessapp.MainActivity
 import com.v1k70r.fitnessapp.R
 import com.v1k70r.fitnessapp.data.local.FitnessDatabase
-import com.v1k70r.fitnessapp.ui.screens.pedometer.data.StepRepository
+import com.v1k70r.fitnessapp.data.local.steps.StepRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

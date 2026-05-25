@@ -1,9 +1,6 @@
 package com.v1k70r.fitnessapp.ui.screens.nutrition
 
 import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.v1k70r.fitnessapp.data.local.FitnessDatabase
@@ -12,6 +9,9 @@ import com.v1k70r.fitnessapp.data.local.nutrition.NutritionRepository
 import com.v1k70r.fitnessapp.domain.model.FoodItem
 import com.v1k70r.fitnessapp.domain.model.MealType
 import com.v1k70r.fitnessapp.domain.model.NutritionEntry
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -24,8 +24,8 @@ class NutritionViewModel(
 
     private var allFoods: List<FoodItem> = emptyList()
 
-    var uiState by mutableStateOf(NutritionUiState())
-        private set
+    private val _uiState = MutableStateFlow(NutritionUiState())
+    val uiState: StateFlow<NutritionUiState> = _uiState.asStateFlow()
 
     init {
 
@@ -82,50 +82,45 @@ class NutritionViewModel(
                         )
                     }
 
-                    uiState = uiState.copy(
+                    _uiState.value = _uiState.value.copy(
                         entries = mappedEntries
                     )
                 }
         }
     }
 
-    val filteredFoods: List<FoodItem>
-        get() {
+    fun filteredFoods(query: String): List<FoodItem> {
+        val trimmed = query.trim()
+        if (trimmed.isBlank()) return allFoods
 
-            val query = uiState.searchQuery.trim()
-
-            return if (query.isBlank()) {
-                allFoods
-            } else {
-                allFoods.filter {
-                    it.name.contains(query, ignoreCase = true)
-                }
-            }
+        return allFoods.filter {
+            it.name.contains(trimmed, ignoreCase = true)
         }
+    }
 
     fun selectMealType(mealType: MealType) {
-        uiState = uiState.copy(selectedMealType = mealType)
+        _uiState.value = _uiState.value.copy(selectedMealType = mealType)
     }
 
     fun onSearchChange(value: String) {
-        uiState = uiState.copy(searchQuery = value)
+        _uiState.value = _uiState.value.copy(searchQuery = value)
     }
 
     fun selectFood(food: FoodItem) {
-        uiState = uiState.copy(selectedFood = food)
+        _uiState.value = _uiState.value.copy(selectedFood = food)
     }
 
     fun onGramsChange(value: String) {
-        uiState = uiState.copy(
+        _uiState.value = _uiState.value.copy(
             gramsInput = value.filter { it.isDigit() }
         )
     }
 
     fun addSelectedFood() {
 
-        val food = uiState.selectedFood ?: return
+        val food = _uiState.value.selectedFood ?: return
 
-        val grams = uiState.gramsInput.toIntOrNull()
+        val grams = _uiState.value.gramsInput.toIntOrNull()
             ?: return
 
         viewModelScope.launch {
@@ -133,13 +128,13 @@ class NutritionViewModel(
             repository.insertEntry(
                 NutritionEntryEntity(
                     foodId = food.id,
-                    mealType = uiState.selectedMealType.name,
+                    mealType = _uiState.value.selectedMealType.name,
                     grams = grams,
                     date = LocalDate.now().toString()
                 )
             )
 
-            uiState = uiState.copy(
+            _uiState.value = _uiState.value.copy(
                 selectedFood = null,
                 searchQuery = "",
                 gramsInput = "100"
@@ -155,7 +150,7 @@ class NutritionViewModel(
     }
 
     fun entriesByMealType(mealType: MealType): List<NutritionEntry> {
-        return uiState.entries.filter {
+        return _uiState.value.entries.filter {
             it.mealType == mealType
         }
     }

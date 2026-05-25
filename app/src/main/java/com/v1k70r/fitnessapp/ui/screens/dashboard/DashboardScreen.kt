@@ -2,6 +2,7 @@ package com.v1k70r.fitnessapp.ui.screens.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import com.v1k70r.fitnessapp.ui.screens.nutrition.NutritionViewModel
 import com.v1k70r.fitnessapp.ui.screens.pedometer.PedometerViewModel
 import com.v1k70r.fitnessapp.ui.screens.training.TrainingViewModel
-import java.util.Calendar
+import java.time.Instant
+import java.time.ZoneId
+import java.time.LocalDate
 
 @Composable
 fun DashboardScreen(
@@ -32,7 +35,7 @@ fun DashboardScreen(
 ) {
     val sesionesEntrenamiento by trainingViewModel.sesionesEntrenamiento.collectAsState()
     val pasosState by pedometerViewModel.uiState.collectAsState()
-    val nutritionState = nutritionViewModel.uiState
+    val nutritionState by nutritionViewModel.uiState.collectAsState()
 
     val sesionActivaHoy = sesionesEntrenamiento.firstOrNull { session ->
         session.endedAt == null && esHoy(session.startedAt)
@@ -67,8 +70,8 @@ fun DashboardScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp)
+            .padding(horizontal = 20.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
             text = "Inicio",
@@ -119,18 +122,18 @@ private fun DashboardPasosCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(22.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
                 text = "Pasos de hoy",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = "$pasos",
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
             )
 
@@ -141,13 +144,13 @@ private fun DashboardPasosCard(
 
             Text(
                 text = "${(progreso * 100).toInt()}% de la meta diaria ($meta pasos)",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DashboardMiniCard(
                     modifier = Modifier.weight(1f),
@@ -164,7 +167,7 @@ private fun DashboardPasosCard(
 
             Text(
                 text = if (pausado) "Conteo pausado" else "Conteo activo",
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -187,24 +190,24 @@ private fun DashboardNutricionCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
-            modifier = Modifier.padding(22.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
                 text = "Nutrición",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = "$calorias kcal consumidas hoy",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DashboardMiniCard(
                     modifier = Modifier.weight(1f),
@@ -244,12 +247,12 @@ private fun DashboardEntrenoCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
-            modifier = Modifier.padding(22.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
                 text = "Entrenamiento",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
@@ -259,13 +262,13 @@ private fun DashboardEntrenoCard(
                 } else {
                     "No hay entrenamiento activo"
                 },
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 DashboardMiniCard(
                     modifier = Modifier.weight(1f),
@@ -281,17 +284,17 @@ private fun DashboardEntrenoCard(
             }
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = "Último ejercicio",
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Text(
                     text = ultimoEjercicio,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -313,8 +316,8 @@ private fun DashboardMiniCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = titulo,
@@ -324,7 +327,7 @@ private fun DashboardMiniCard(
 
             Text(
                 text = valor,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -332,12 +335,9 @@ private fun DashboardMiniCard(
 }
 
 private fun esHoy(timestamp: Long): Boolean {
-    val calendarioSesion = Calendar.getInstance().apply {
-        timeInMillis = timestamp
-    }
+    val fechaSesion = Instant.ofEpochMilli(timestamp)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
 
-    val calendarioHoy = Calendar.getInstance()
-
-    return calendarioSesion.get(Calendar.YEAR) == calendarioHoy.get(Calendar.YEAR) &&
-            calendarioSesion.get(Calendar.DAY_OF_YEAR) == calendarioHoy.get(Calendar.DAY_OF_YEAR)
+    return fechaSesion == LocalDate.now()
 }
